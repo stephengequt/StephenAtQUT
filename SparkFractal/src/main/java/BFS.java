@@ -1,4 +1,11 @@
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 //import java.util.Vector;
 
@@ -7,10 +14,12 @@ public class BFS {
 	public static int[] NumCount(int root, int[] offset, int[] column, int N){
 		
 		int[] layer = new int[N];  // the layer of each node
+		//N = the total number of central Nodes
+		//root = central node
 		
 		//Vector<Integer> blackNode = new Vector<Integer>(0);
 		Queue<Integer> blackNode = new LinkedList<>();
-		
+
 		try {
 			blackNode.offer(root);   // Set of black nodes
 			int l= 0;

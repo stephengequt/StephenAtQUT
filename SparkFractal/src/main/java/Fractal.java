@@ -33,27 +33,7 @@ public class Fractal {
 
 
 
-
-
 		try {
-//
-//			Logger.getLogger("org").setLevel(Level.ERROR);
-//			SparkConf conf = new SparkConf().setAppName("Calculation").setMaster("local[*]");
-//			JavaSparkContext sc = new JavaSparkContext(conf);
-//
-//			int NUM_SAMPLES = 100;
-//			List<Integer> l = new ArrayList<>(NUM_SAMPLES);
-//			for (int i = 0; i < NUM_SAMPLES; i++) {
-//				l.add(i);
-//			}
-//
-//			long count = sc.parallelize(l).filter(i -> {
-//				double x = Math.random();
-//				double y = Math.random();
-//				return x*x + y*y < 1;
-//			}).count();
-//			System.out.println("Pi is roughly " + 4.0 * count / NUM_SAMPLES);
-
 
 			for (int i = 0; i < centerNode.length; i++) {   // for sample nodes, calculate UU and VV
 				if (i % 100 == 0) {
@@ -119,10 +99,10 @@ public class Fractal {
 		} catch (Exception e) {
 			System.out.println("Fractal Error");
 		}
-		//long calculationTime=System.currentTimeMillis(); // Get start time
-		//System.out.println("Calculation time:"+(calculationTime-countTime)+"ms");
-
-		//Write UU, VV to .dat file
+//		long calculationTime=System.currentTimeMillis(); // Get start time
+//		System.out.println("Calculation time:"+(calculationTime-countTime)+"ms");
+//
+//		//Write UU, VV to .dat file
 		try {
 
 			FileWriter writer_UU = new FileWriter("Results/UU.dat");

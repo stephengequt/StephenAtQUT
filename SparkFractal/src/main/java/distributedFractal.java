@@ -45,45 +45,45 @@ public class distributedFractal {
 				int[] number;
 				number = BFS.NumCount(centerNode[i], offset, column, N);  // calculate the number of nodes within radius 'r' of centerNode[i]
 
-//				if (number.length <= networkDiameter) {            // the case when the depth of centerNode[i] is less than network diameter
-//					for (int j = 0; j < num_q; j++) {
-//						double q = -10 + 1 * ((double) j) / 3;    // Set the values of q
-//						for (int k = 0; k < number.length; k++) {      // calculate VV , the contribution of each center node is 1/N_3
-////						if (q == 1) {
-////							VV[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
-////						} else {
-////							VV[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
-////						}
-////							Tuple2<String, vvPairValue> vvPair = new Tuple2<String, vvPairValue>(new vvPairValue(j,k,q,number[k]).getIndex(), new vvPairValue(j,k,q,number[k]));
-////							vvList.add(vvPair);
-//
-//							writer_VV_spark.write(Integer.toString(j) + " " + Integer.toString(k) + "," + Double.toString(q) + "," + Integer.toString(number[k]) + "\n");
+				if (number.length <= networkDiameter) {            // the case when the depth of centerNode[i] is less than network diameter
+					for (int j = 0; j < num_q; j++) {
+						double q = -10 + 1 * ((double) j) / 3;    // Set the values of q
+						for (int k = 0; k < number.length; k++) {      // calculate VV , the contribution of each center node is 1/N_3
+//						if (q == 1) {
+//							VV[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
+//						} else {
+//							VV[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
 //						}
-//					}
-//				}
-// 					else {                             // the case when the depth of centerNode[i] is greater than network diameter
-//					double[][] VVTmp = new double[num_q][number.length];
-//
-//					for (int j = 0; j < num_q; j++) {
-//						double q = -10 + 1 * ((double) j) / 3;
-//						for (int k = 0; k < networkDiameter; k++) {
-//							if (q == 1) {
-//								VVTmp[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
-//							} else {
-//								VVTmp[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
-//							}
-//						}
-//						for (int k = networkDiameter; k < number.length; k++) {
-//							if (q == 1) {
-//								VVTmp[j][k] = number[k] * Math.log(number[k]) / N_3;
-//							} else {
-//								VVTmp[j][k] = Math.pow(number[k], q - 1) / N_3;
-//							}
-//						}
-//					}
-//					VV = VVTmp;
-//					networkDiameter = number.length;
-//				}
+//							Tuple2<String, vvPairValue> vvPair = new Tuple2<String, vvPairValue>(new vvPairValue(j,k,q,number[k]).getIndex(), new vvPairValue(j,k,q,number[k]));
+//							vvList.add(vvPair);
+
+							writer_VV_spark.write(Integer.toString(j) + " " + Integer.toString(k) + "," + Double.toString(q) + "," + Integer.toString(number[k]) + "\n");
+						}
+					}
+				}
+ 					else {                             // the case when the depth of centerNode[i] is greater than network diameter
+					double[][] VVTmp = new double[num_q][number.length];
+
+					for (int j = 0; j < num_q; j++) {
+						double q = -10 + 1 * ((double) j) / 3;
+						for (int k = 0; k < networkDiameter; k++) {
+							if (q == 1) {
+								VVTmp[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
+							} else {
+								VVTmp[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
+							}
+						}
+						for (int k = networkDiameter; k < number.length; k++) {
+							if (q == 1) {
+								VVTmp[j][k] = number[k] * Math.log(number[k]) / N_3;
+							} else {
+								VVTmp[j][k] = Math.pow(number[k], q - 1) / N_3;
+							}
+						}
+					}
+					VV = VVTmp;
+					networkDiameter = number.length;
+				}
 			}
 			writer_VV_spark.close();
 
@@ -94,37 +94,37 @@ public class distributedFractal {
 		System.out.println("SucceedWriting" + "VVtemp.text");
 
 
-//		Logger.getLogger("org").setLevel(Level.ERROR);
-//		SparkConf conf = new SparkConf().setAppName("Calculation").setMaster("local[*]");
-//		JavaSparkContext sc = new JavaSparkContext(conf);
-//
-//		JavaRDD<String> lines = sc.textFile("SparkInput/VVTemp.text");
-//
-//		JavaPairRDD<String, PairQAndNumk> qnumkPairRDD = lines.mapToPair(
-//				line -> new Tuple2<>(line.split(",")[0],
-//						new PairQAndNumk(Double.parseDouble((line.split(",")[1])), Integer.valueOf(line.split(",")[2]))));
-//
-//		//TODO: should N_3 be added directly as a number?
-//
-//		//If case 1: q == 1
-//		JavaPairRDD<String, PairQAndNumk> case1filter = qnumkPairRDD.filter(pairQAndNumk -> pairQAndNumk._2().getq() == 1.0 );
-////		case1filter.saveAsTextFile("SparkOut/mapcase1filter.text");
-//
-//		//TODO: Check filter
-//		//TODO: Combine two cases
-//		JavaPairRDD<String, Double> mapcase1 = case1filter.mapValues(pairQAndNumk -> pairQAndNumk.getnumk() * Math.log(pairQAndNumk.getnumk()));
-//		JavaPairRDD<String, Double> reducecase1 = mapcase1.reduceByKey((x, y) -> x + y);
-//
-//		reducecase1.saveAsTextFile("SparkOut/mapcase1.text");
-//
-//		//If case 2: q != 1
-//		JavaPairRDD<String, PairQAndNumk> case2filter = qnumkPairRDD.filter(pairQAndNumk -> pairQAndNumk._2().getq() != 1.0 );
-////		case2filter.saveAsTextFile("SparkOut/mapcase2filter.text");
-//
-//		JavaPairRDD<String, Double> mapcase2 = case2filter.mapValues(pairQAndNumk -> Math.pow(pairQAndNumk.getnumk(),pairQAndNumk.getq() - 1));
-//		JavaPairRDD<String, Double> reducecase2 = mapcase2.reduceByKey((x, y) -> x + y);
-//
-//		reducecase2.saveAsTextFile("SparkOut/mapcase2.text");
+		Logger.getLogger("org").setLevel(Level.ERROR);
+		SparkConf conf = new SparkConf().setAppName("Calculation").setMaster("local[*]");
+		JavaSparkContext sc = new JavaSparkContext(conf);
+
+		JavaRDD<String> lines = sc.textFile("SparkInput/VVTemp.text");
+
+		JavaPairRDD<String, entity.PairQAndNumk> qnumkPairRDD = lines.mapToPair(
+				line -> new Tuple2<>(line.split(",")[0],
+						new entity.PairQAndNumk(Double.parseDouble((line.split(",")[1])), Integer.valueOf(line.split(",")[2]))));
+
+		//TODO: should N_3 be added directly as a number?
+
+		//If case 1: q == 1
+		JavaPairRDD<String, entity.PairQAndNumk> case1filter = qnumkPairRDD.filter(pairQAndNumk -> pairQAndNumk._2().getq() == 1.0 );
+//		case1filter.saveAsTextFile("SparkOut/mapcase1filter.text");
+
+		//TODO: Check filter
+		//TODO: Combine two cases
+		JavaPairRDD<String, Double> mapcase1 = case1filter.mapValues(pairQAndNumk -> pairQAndNumk.getnumk() * Math.log(pairQAndNumk.getnumk()));
+		JavaPairRDD<String, Double> reducecase1 = mapcase1.reduceByKey((x, y) -> x + y);
+
+		reducecase1.saveAsTextFile("SparkOut/mapcase1.text");
+
+		//If case 2: q != 1
+		JavaPairRDD<String, entity.PairQAndNumk> case2filter = qnumkPairRDD.filter(pairQAndNumk -> pairQAndNumk._2().getq() != 1.0 );
+//		case2filter.saveAsTextFile("SparkOut/mapcase2filter.text");
+
+		JavaPairRDD<String, Double> mapcase2 = case2filter.mapValues(pairQAndNumk -> Math.pow(pairQAndNumk.getnumk(),pairQAndNumk.getq() - 1));
+		JavaPairRDD<String, Double> reducecase2 = mapcase2.reduceByKey((x, y) -> x + y);
+
+		reducecase2.saveAsTextFile("SparkOut/mapcase2.text");
 
 
 
