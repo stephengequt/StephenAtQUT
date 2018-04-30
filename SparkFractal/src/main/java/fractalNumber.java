@@ -3,8 +3,11 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.DoubleFlatMapFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +16,7 @@ public class fractalNumber {
 
 
 
-	public static void distributedBNumberCalculation(int N, int[] offset, int[] column) {
+	public static void distributedBNumberCalculation(int N, int[] offset, int[] column, int[] centerNode) {
 
 
 		//String fileName = "Aa9001.dat";
@@ -27,10 +30,10 @@ public class fractalNumber {
 		// long startTime=System.currentTimeMillis(); // Get start time
 		// long loadTime=System.currentTimeMillis(); // Get start time
 
-		int[] centerNode;
-		centerNode = GenRandomOrder(N, N_3);
-		double[][] VV = new double[num_q][networkDiameter];
-		double[] UU = new double[networkDiameter];
+//		int[] centerNode;
+//		centerNode = GenRandomOrder(N, N_3);
+//		double[][] VV = new double[num_q][networkDiameter];
+//		double[] UU = new double[networkDiameter];
 
 
 
@@ -43,28 +46,113 @@ public class fractalNumber {
 			l.add(i);
 		}
 
-		JavaRDD<Integer> numberRDD = sc.parallelize(l).mapPartitions(
-				(FlatMapFunction<Iterator<Integer>, Integer>) i -> {
-					ArrayList<Integer> numbers = new ArrayList<>();
-					int[] eachNumberArray;
+//		JavaRDD<Integer> numberRDD = sc.parallelize(l).mapPartitions(
+//				new FlatMapFunction<Iterator<Integer>, Integer>() {
+//					@Override
+//					public Iterator<Integer> call(Iterator<Integer> i) throws Exception {
+//						ArrayList<Integer> numbers = new ArrayList<>();
+//						int[] eachNumberArray;
+//						try {
+//							while (i.hasNext()) {
+//								eachNumberArray = BFS.NumCount(centerNode[i.next()], offset, column, N);
+////							numbers.add(eachNumberArray.length);
+//								for (int eachNumber : eachNumberArray) {
+//									numbers.add(eachNumber);
+//								}
+//							}
+//						} catch (Exception e) {
+//						}
+//						return numbers.iterator();
+//					}
+//				});
+//		numberRDD.saveAsTextFile("SparkOut/Test3.dat");
+
+
+
+		JavaRDD<Double> numberRDD = sc.parallelize(l).mapPartitions(
+				(FlatMapFunction<Iterator<Integer>, Double>) i -> {
+//					int networkDiameter = 1;  //Set the network diameter to 1. It will increase as the calculation continues.
+					double[][] VV = new double[num_q][networkDiameter];
+					double[] UU = new double[networkDiameter];
+					ArrayList<Double> VVcontainer = new ArrayList<>();
+
 					try {
 						while (i.hasNext()) {
-							eachNumberArray = BFS.NumCount(centerNode[i.next()], offset, column, N);
-							numbers.add(eachNumberArray.length);
-//							for (int eachNumber : eachNumberArray) {
-//								numbers.add(eachNumber);
-//							}
-						}
-					} catch (Exception e){}
-					return numbers.iterator();
-				});
+							int[] number;
+							number = BFS.NumCount(centerNode[i.next()], offset, column, N);  // calculate the number of nodes within radius 'r' of centerNode[i]
 
-		numberRDD.saveAsTextFile("SparkOut/Test3.dat");
+							if (number.length <= networkDiameter) {            // the case when the depth of centerNode[i] is less than network diameter
+								for (int j = 0; j < num_q; j++) {
+									double q = -10 + 1 * ((double) j) / 3;    // Set the values of q
+									for (int k = 0; k < number.length; k++) {      // calculate VV , the contribution of each center node is 1/N_3
+										if (q == 1) {
+											VV[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
+										} else {
+											VV[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
+										}
+									}
+
+								}
+							} else {                             // the case when the depth of centerNode[i] is greater than network diameter
+								double[][] VVTmp = new double[num_q][number.length];
+
+								for (int j = 0; j < num_q; j++) {
+									double q = -10 + 1 * ((double) j) / 3;
+									for (int k = 0; k < networkDiameter; k++) {
+										if (q == 1) {
+											VVTmp[j][k] = VV[j][k] + number[k] * Math.log(number[k]) / N_3;
+										} else {
+											VVTmp[j][k] = VV[j][k] + Math.pow(number[k], q - 1) / N_3;
+										}
+									}
+									for (int k = networkDiameter; k < number.length; k++) {
+										if (q == 1) {
+											VVTmp[j][k] = number[k] * Math.log(number[k]) / N_3;
+										} else {
+											VVTmp[j][k] = Math.pow(number[k], q - 1) / N_3;
+										}
+									}
+								}
+								VV = VVTmp;
+//								networkDiameter = number.length;
+							}
+						}
+
+//						for (int j = 0; j < num_q; j++) {
+//							double q = -10 + 1 * ((double) j) / 3;
+//							for (int k = 0; k < networkDiameter; k++) {
+//								if (q == 1) {
+//
+//								} else {
+//									VV[j][k] = Math.log(VV[j][k]) / (q - 1);
+//								}
+//							}
+//						}
+
+//						double[] UUTmp = new double[networkDiameter];
+//						for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
+//							UUTmp[j] = Math.log(((double) (j + 1)) / networkDiameter);
+//						}
+//						UU = UUTmp;
+
+						for (double[] eachVVi : VV) {
+							for (double eachVVj :eachVVi)
+									VVcontainer.add(eachVVj);
+								}
+
+						return VVcontainer.iterator();
+					} catch (Exception e) {
+						System.out.println("Fractal Error");
+						return null;
+					}
+
+
+				});
+		numberRDD.saveAsTextFile("SparkOut/Test5.dat");
 
 
 
 //		try {
-//
 //			for (int i = 0; i < centerNode.length; i++) {   // for sample nodes, calculate UU and VV
 //				if (i % 100 == 0) {
 //					System.out.printf("Progess: %.3f%%\n", (((double) i) / centerNode.length) * 100);
@@ -129,9 +217,9 @@ public class fractalNumber {
 //		} catch (Exception e) {
 //			System.out.println("Fractal Error");
 //		}
-//		//long calculationTime=System.currentTimeMillis(); // Get start time
-//		//System.out.println("Calculation time:"+(calculationTime-countTime)+"ms");
-//
+		//long calculationTime=System.currentTimeMillis(); // Get start time
+		//System.out.println("Calculation time:"+(calculationTime-countTime)+"ms");
+
 //		//Write UU, VV to .dat file
 //		try {
 //
@@ -156,10 +244,10 @@ public class fractalNumber {
 //		} catch (IOException iox) {
 //			System.out.println("Problemwriting" + "UU.dat" + "VV.dat");
 //		}
-//
-//		System.out.println("Fatal dimension calculation finished");
-//		//long endTime=System.currentTimeMillis(); // Get end time
-//		//System.out.println("Running time:"+(endTime-startTime)+"ms");
+
+		System.out.println("Fatal dimension calculation finished");
+		//long endTime=System.currentTimeMillis(); // Get end time
+		//System.out.println("Running time:"+(endTime-startTime)+"ms");
 	}
 
 

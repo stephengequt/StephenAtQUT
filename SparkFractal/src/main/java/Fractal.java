@@ -12,7 +12,7 @@ import java.util.List;
 public class Fractal {
 
 
-	public static void calculate(int N, int[] offset, int[] column) {
+	public static void calculate(int N, int[] offset, int[] column, int[] centerNode) {
 
 
 		//String fileName = "Aa9001.dat";
@@ -26,8 +26,8 @@ public class Fractal {
 		// long startTime=System.currentTimeMillis(); // Get start time
 		// long loadTime=System.currentTimeMillis(); // Get start time
 
-		int[] centerNode;
-		centerNode = GenRandomOrder(N, N_3);
+//		int[] centerNode;
+//		centerNode = GenRandomOrder(N, N_3);
 		double[][] VV = new double[num_q][networkDiameter];
 		double[] UU = new double[networkDiameter];
 
@@ -35,7 +35,7 @@ public class Fractal {
 
 		try {
 
-			for (int i = 0; i < centerNode.length; i++) {   // for sample nodes, calculate UU and VV
+			for (int i = 1; i < centerNode.length; i++) {   // for sample nodes, calculate UU and VV
 				if (i % 100 == 0) {
 					System.out.printf("Progess: %.3f%%\n", (((double) i) / centerNode.length) * 100);
 				}
@@ -76,20 +76,20 @@ public class Fractal {
 						}
 					}
 					VV = VVTmp;
-					networkDiameter = number.length;
+//					networkDiameter = number.length;
 				}
 			}
 
-			for (int j = 0; j < num_q; j++) {
-				double q = -10 + 1 * ((double) j) / 3;
-				for (int k = 0; k < networkDiameter; k++) {
-					if (q == 1) {
-
-					} else {
-						VV[j][k] = Math.log(VV[j][k]) / (q - 1);
-					}
-				}
-			}
+//			for (int j = 0; j < num_q; j++) {
+//				double q = -10 + 1 * ((double) j) / 3;
+//				for (int k = 0; k < networkDiameter; k++) {
+//					if (q == 1) {
+//
+//					} else {
+//						VV[j][k] = Math.log(VV[j][k]) / (q - 1);
+//					}
+//				}
+//			}
 
 			double[] UUTmp = new double[networkDiameter];
 			for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
@@ -105,14 +105,14 @@ public class Fractal {
 //		//Write UU, VV to .dat file
 		try {
 
-			FileWriter writer_UU = new FileWriter("Results/UU.dat");
-			for (int i = 0; i < num_q; i++) {
-				for (int j = 0; j < networkDiameter; j++) {
-					writer_UU.write(Double.toString(UU[j]) + ",");
-				}
-				writer_UU.write("\n");
-			}
-			writer_UU.close();
+//			FileWriter writer_UU = new FileWriter("Results/UU.dat");
+//			for (int i = 0; i < num_q; i++) {
+//				for (int j = 0; j < networkDiameter; j++) {
+//					writer_UU.write(Double.toString(UU[j]) + ",");
+//				}
+//				writer_UU.write("\n");
+//			}
+//			writer_UU.close();
 
 			FileWriter writer_VV = new FileWriter("Results/VV.dat");
 			for (int i = 0; i < num_q; i++) {
