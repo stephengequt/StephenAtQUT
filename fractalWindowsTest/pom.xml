@@ -9,11 +9,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-<<<<<<< HEAD
-        <java.version>1.8</java.version>
-    </properties>
-
-=======
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <encoding>UTF-8</encoding>
         <java.version>1.8</java.version>
@@ -35,7 +30,6 @@
         </plugins>
     </build>
 
->>>>>>> 2c8f95d663dd1f78951cd5ae82b5fd397fc1bc77
     <dependencies>
         <dependency> <!-- Spark dependency -->
             <groupId>org.apache.spark</groupId>
@@ -43,7 +37,6 @@
             <version>2.3.0</version>
         </dependency>
     </dependencies>
-
 
 </project>
 
