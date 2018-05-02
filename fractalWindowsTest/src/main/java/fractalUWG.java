@@ -10,13 +10,13 @@ public class fractalUWG {
 	public static void main(String arg[]) {
 		
 //		String fileName = "Input/11_sparse.dat" ;
-		String fileName = "Input/sparse.dat" ;
+		String fileName = "Input/9_sparse.dat" ;
 		Input sparse = new Input();
 		
 		long startTime=System.currentTimeMillis();
 		
-		sparse.E = sparse.getVE("Input/E.dat");   // Read the number of edges in the network
-		sparse.V = sparse.getVE("Input/V.dat");   // Read the number of nodes in the network
+		sparse.E = sparse.getVE("Input/9_E.dat");   // Read the number of edges in the network
+		sparse.V = sparse.getVE("Input/9_V.dat");   // Read the number of nodes in the network
 		sparse.configuration(fileName, sparse.V, sparse.E);   // Convert the standard sparse matrix to compressed sparse matrix
 
 		long inputProcessTime = System.currentTimeMillis();
@@ -28,7 +28,7 @@ public class fractalUWG {
 		centerNode = Fractal.GenRandomOrder(sparse.V, N_3);
 
 
-		Fractal.calculate(sparse.V, sparse.offset, sparse.column, centerNode);
+//		Fractal.calculate(sparse.V, sparse.offset, sparse.column, centerNode);
 //		distributedFractal.distributedCalculate(sparse.V, sparse.offset, sparse.column);
 		fractalNumber.distributedBNumberCalculation(sparse.V, sparse.offset, sparse.column, centerNode);
 

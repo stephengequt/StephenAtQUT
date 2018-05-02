@@ -76,7 +76,7 @@ public class Fractal {
 						}
 					}
 					VV = VVTmp;
-//					networkDiameter = number.length;
+					networkDiameter = number.length;
 				}
 			}
 
@@ -90,12 +90,12 @@ public class Fractal {
 //					}
 //				}
 //			}
-
-			double[] UUTmp = new double[networkDiameter];
-			for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
-				UUTmp[j] = Math.log(((double) (j + 1)) / networkDiameter);
-			}
-			UU = UUTmp;
+//
+//			double[] UUTmp = new double[networkDiameter];
+//			for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
+//				UUTmp[j] = Math.log(((double) (j + 1)) / networkDiameter);
+//			}
+//			UU = UUTmp;
 		} catch (Exception e) {
 			System.out.println("Fractal Error");
 		}
