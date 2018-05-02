@@ -12,7 +12,7 @@ import java.util.List;
 public class Fractal {
 
 
-	public static void calculate(int N, int[] offset, int[] column, int[] centerNode) {
+	public static void calculate(int N, int[] offset, int[] column) {
 
 
 		//String fileName = "Aa9001.dat";
@@ -26,8 +26,8 @@ public class Fractal {
 		// long startTime=System.currentTimeMillis(); // Get start time
 		// long loadTime=System.currentTimeMillis(); // Get start time
 
-//		int[] centerNode;
-//		centerNode = GenRandomOrder(N, N_3);
+		int[] centerNode;
+		centerNode = GenRandomOrder(N, N_3);
 		double[][] VV = new double[num_q][networkDiameter];
 		double[] UU = new double[networkDiameter];
 

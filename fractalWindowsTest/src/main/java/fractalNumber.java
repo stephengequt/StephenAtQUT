@@ -2,35 +2,28 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.DoubleFlatMapFunction;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.sql.Encoders;
+import scala.Double;
 import scala.Tuple2;
 
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-
-import javax.xml.ws.Response;
 
 public class fractalNumber {
 
 
-    public static void distributedBNumberCalculation(int N, int[] offset, int[] column, int[] centerNode) {
+    public static void distributedVVCalculation(int N, int[] offset, int[] column) {
 
 
         //String fileName = "Aa9001.dat";
         //String line;
         //int N = 10924;    //Set the size of Network
-//		int N_3 = N / 10;   //Set the number of center nodes
+		int N_3 = N / 10;   //Set the number of center nodes
 //		int num_q = 61;
 //		int networkDiameter = 1;  //Set the network diameter to 1. It will increase as the calculation continues.
 
@@ -38,11 +31,10 @@ public class fractalNumber {
         // long startTime=System.currentTimeMillis(); // Get start time
         // long loadTime=System.currentTimeMillis(); // Get start time
 
-//		int[] centerNode;
-//		centerNode = GenRandomOrder(N, N_3);
+		int[] centerNode;
+		centerNode = Fractal.GenRandomOrder(N, N_3);
 //		double[][] VV = new double[num_q][networkDiameter];
 //		double[] UU = new double[networkDiameter];
-
 
         Logger.getLogger("org").setLevel(Level.ERROR);
         SparkConf conf = new SparkConf().setAppName("numberGenerater").setMaster("local[*]");
@@ -181,7 +173,7 @@ public class fractalNumber {
 ////        flatMapTest.saveAsTextFile("SparkOut/indexTest.dat");
 //
 //        JavaPairRDD<Integer, Double> reducedTest = flatMapTest.reduceByKey((x, y) -> x + y);
-//
+
 //        JavaPairRDD<Integer, Double> sortedTest = reducedTest.sortByKey();
 //
 //        sortedTest.saveAsTextFile("SparkOut/SortedReducedTest.dat");
@@ -204,7 +196,6 @@ public class fractalNumber {
                 (PairFlatMapFunction<Iterator<Integer>, Integer, Double>) i -> {
                     int networkDiameter = 1;  //Set the network diameter to 1. It will increase as the calculation continues.
                     int num_q = 61;
-                    int N_3 = N / 10;   //Set the number of center nodes
                     double[][] VV = new double[num_q][networkDiameter];
                     double[] UU = new double[networkDiameter];
                     ArrayList<Tuple2<Integer, Double>> VVcontainer = new ArrayList<>();
@@ -276,7 +267,8 @@ public class fractalNumber {
                         int index = 0;
 						for (int j = 0; j < num_q; j++) {
 							for (int k = 0; k < networkDiameter; k++) {
-								VVcontainer.add(new Tuple2<>(index, VV[j][k]));
+                                Tuple2 tp = new Tuple2<>(index, VV[j][k]);
+								VVcontainer.add(tp);
 								index++;
 							}
 						}
@@ -294,6 +286,23 @@ public class fractalNumber {
         JavaPairRDD<Integer, Double> sortedTest = reducedTest.sortByKey();
 
         sortedTest.saveAsTextFile("SparkOut/PartitionTest.dat");
+
+        String line;
+//        try{
+//            BufferedReader in = new BufferedReader(new FileReader("SparkOut/PartitionTest.dat"));
+//            double[][] VV = new double[num_q][512];
+//            for (int j =0; j < num_q; j++) {
+//                for (int k = 0; k < 512; k++) {
+//                    line = in.readLine();
+//                    String[] data = line.trim().split(",");
+//                    VV[j][k] = .(data[0]);
+//                }
+//
+//            }
+//
+//        } catch (IOException iox) {
+//            System.out.println("Failed Reading Array VV");
+//        }
 
 
         System.out.println("Fatal dimension calculation finished");
