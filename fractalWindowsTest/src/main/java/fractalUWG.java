@@ -2,13 +2,13 @@ public class fractalUWG {
 	public static void main(String arg[]) {
 		
 //		String fileName = "Input/11_sparse.dat" ;
-		String fileName = "Input/9_sparse.dat" ;
+		String fileName = "Input/11_sparse.dat" ;
 		Input sparse = new Input();
 		
 		long startTime=System.currentTimeMillis();
 		
-		sparse.E = sparse.getVE("Input/9_E.dat");   // Read the number of edges in the network
-		sparse.V = sparse.getVE("Input/9_V.dat");   // Read the number of nodes in the network
+		sparse.E = sparse.getVE("Input/11_E.dat");   // Read the number of edges in the network
+		sparse.V = sparse.getVE("Input/11_V.dat");   // Read the number of nodes in the network
 		sparse.configuration(fileName, sparse.V, sparse.E);   // Convert the standard sparse matrix to compressed sparse matrix
 
 		long inputProcessTime = System.currentTimeMillis();
@@ -19,10 +19,14 @@ public class fractalUWG {
 
 		Fractal.calculate(sparse.V, sparse.offset, sparse.column);
 //		distributedFractal.distributedCalculate(sparse.V, sparse.offset, sparse.column);
-		fractalNumber.distributedVVCalculation(sparse.V, sparse.offset, sparse.column);
 
 		long calculationTime=System.currentTimeMillis(); // Get start time
 		System.out.println("Calculation time:"+(calculationTime-inputProcessTime)+"ms");
+
+		fractalNumber.distributedVVCalculation(sparse.V, sparse.offset, sparse.column);
+
+		long sparkCalculationTime=System.currentTimeMillis(); // Get start time
+		System.out.println("Spark Calculation time:"+(sparkCalculationTime-calculationTime)+"ms");
 
 	}
 }

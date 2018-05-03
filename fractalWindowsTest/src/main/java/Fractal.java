@@ -80,22 +80,22 @@ public class Fractal {
 				}
 			}
 
-//			for (int j = 0; j < num_q; j++) {
-//				double q = -10 + 1 * ((double) j) / 3;
-//				for (int k = 0; k < networkDiameter; k++) {
-//					if (q == 1) {
-//
-//					} else {
-//						VV[j][k] = Math.log(VV[j][k]) / (q - 1);
-//					}
-//				}
-//			}
-//
-//			double[] UUTmp = new double[networkDiameter];
-//			for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
-//				UUTmp[j] = Math.log(((double) (j + 1)) / networkDiameter);
-//			}
-//			UU = UUTmp;
+			for (int j = 0; j < num_q; j++) {
+				double q = -10 + 1 * ((double) j) / 3;
+				for (int k = 0; k < networkDiameter; k++) {
+					if (q == 1) {
+
+					} else {
+						VV[j][k] = Math.log(VV[j][k]) / (q - 1);
+					}
+				}
+			}
+
+			double[] UUTmp = new double[networkDiameter];
+			for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
+				UUTmp[j] = Math.log(((double) (j + 1)) / networkDiameter);
+			}
+			UU = UUTmp;
 		} catch (Exception e) {
 			System.out.println("Fractal Error");
 		}
@@ -105,14 +105,14 @@ public class Fractal {
 //		//Write UU, VV to .dat file
 		try {
 
-//			FileWriter writer_UU = new FileWriter("Results/UU.dat");
-//			for (int i = 0; i < num_q; i++) {
-//				for (int j = 0; j < networkDiameter; j++) {
-//					writer_UU.write(Double.toString(UU[j]) + ",");
-//				}
-//				writer_UU.write("\n");
-//			}
-//			writer_UU.close();
+			FileWriter writer_UU = new FileWriter("Results/UU.dat");
+			for (int i = 0; i < num_q; i++) {
+				for (int j = 0; j < networkDiameter; j++) {
+					writer_UU.write(Double.toString(UU[j]) + ",");
+				}
+				writer_UU.write("\n");
+			}
+			writer_UU.close();
 
 			FileWriter writer_VV = new FileWriter("Results/VV.dat");
 			for (int i = 0; i < num_q; i++) {

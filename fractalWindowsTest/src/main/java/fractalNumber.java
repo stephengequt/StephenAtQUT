@@ -2,13 +2,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import scala.Double;
 import scala.Tuple2;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,16 +24,16 @@ public class fractalNumber {
         //String fileName = "Aa9001.dat";
         //String line;
         //int N = 10924;    //Set the size of Network
-		int N_3 = N / 10;   //Set the number of center nodes
-//		int num_q = 61;
+        int N_3 = N / 10;   //Set the number of center nodes
+        int num_q = 61;
 //		int networkDiameter = 1;  //Set the network diameter to 1. It will increase as the calculation continues.
 
 
         // long startTime=System.currentTimeMillis(); // Get start time
         // long loadTime=System.currentTimeMillis(); // Get start time
 
-		int[] centerNode;
-		centerNode = Fractal.GenRandomOrder(N, N_3);
+        int[] centerNode;
+        centerNode = Fractal.GenRandomOrder(N, N_3);
 //		double[][] VV = new double[num_q][networkDiameter];
 //		double[] UU = new double[networkDiameter];
 
@@ -179,7 +180,6 @@ public class fractalNumber {
 //        sortedTest.saveAsTextFile("SparkOut/SortedReducedTest.dat");
 
 
-
 //        for (int j = 0; j < num_q; j++) {
 //							double q = -10 + 1 * ((double) j) / 3;
 //							for (int k = 0; k < networkDiameter; k++) {
@@ -195,7 +195,7 @@ public class fractalNumber {
         JavaPairRDD<Integer, Double> numberPartitionRDD = sc.parallelize(l).mapPartitionsToPair(
                 (PairFlatMapFunction<Iterator<Integer>, Integer, Double>) i -> {
                     int networkDiameter = 1;  //Set the network diameter to 1. It will increase as the calculation continues.
-                    int num_q = 61;
+//                    int num_q = 61;
                     double[][] VV = new double[num_q][networkDiameter];
                     double[] UU = new double[networkDiameter];
                     ArrayList<Tuple2<Integer, Double>> VVcontainer = new ArrayList<>();
@@ -240,6 +240,8 @@ public class fractalNumber {
                                 VV = VVTmp;
                                 networkDiameter = number.length;
                             }
+
+
                         }
 
 //						for (int j = 0; j < num_q; j++) {
@@ -264,15 +266,14 @@ public class fractalNumber {
 //                                VVcontainer.add(eachVVj);
 //                        }
 
-                        int index = 0;
-						for (int j = 0; j < num_q; j++) {
-							for (int k = 0; k < networkDiameter; k++) {
-                                Tuple2 tp = new Tuple2<>(index, VV[j][k]);
-								VVcontainer.add(tp);
-								index++;
-							}
-						}
 
+                        int index = 0;
+                        for (int j = 0; j < num_q; j++) {
+                            for (int k = 0; k < networkDiameter; k++) {
+                                VVcontainer.add(new Tuple2<>(index, VV[j][k]));
+                                index++;
+                            }
+                        }
                         return VVcontainer.iterator();
                     } catch (Exception e) {
                         System.out.println("Fractal Error");
@@ -284,20 +285,79 @@ public class fractalNumber {
         JavaPairRDD<Integer, Double> reducedTest = numberPartitionRDD.reduceByKey((x, y) -> x + y);
 
         JavaPairRDD<Integer, Double> sortedTest = reducedTest.sortByKey();
+        JavaRDD<Double> valueOfVV = sortedTest.map(m -> m._2());
 
-        sortedTest.saveAsTextFile("SparkOut/PartitionTest.dat");
 
-        String line;
+//        valueOfVV.saveAsTextFile("SparkOut/PartitionTest.dat");
+//
+//        JavaPairRDD<Double, Integer> nextStepVV = sortedTest.mapToPair(vvRow -> new Tuple2<Double, Integer>(vvRow._2(), vvRow._1()));
+//        JavaPairRDD<Double, Integer> nextStep2VV = nextStepVV.mapValues(index -> ((index.+1)/num_q));
+
+//        nextStep2VV.saveAsTextFile("SparkOut/Index2.text");
+
+        List<Double> vvPairs = valueOfVV.collect();
+//
+        int networkDiameter = vvPairs.size() / 61;
+        int index = 0;
+        double[][] VV = new double[num_q][networkDiameter];
+        for (int j = 0; j < num_q; j++) {
+            double q = -10 + 1 * ((double) j) / 3;
+            for (int k = 0; k < networkDiameter; k++) {
+                if (q == 1) {
+                    VV[j][k] = vvPairs.get(index);
+                } else {
+                    VV[j][k] = Math.log(vvPairs.get(index)) / (q - 1);
+                }
+                index++;
+            }
+        }
+
+
+        double[] UU = new double[networkDiameter];
+        for (int j = 0; j < networkDiameter; j++) {              // Calculate UU
+            UU[j] = Math.log(((double) (j + 1)) / networkDiameter);
+        }
+
+        try {
+
+			FileWriter writer_UU = new FileWriter("Results/UUTemp.dat");
+			for (int i = 0; i < num_q; i++) {
+				for (int j = 0; j < networkDiameter; j++) {
+					writer_UU.write(Double.toString(UU[j]) + ",");
+				}
+				writer_UU.write("\n");
+			}
+			writer_UU.close();
+
+            FileWriter writer_VV = new FileWriter("Results/VVTemp.dat");
+            for (int i = 0; i < num_q; i++) {
+                for (int j = 0; j < networkDiameter; j++) {
+                    writer_VV.write(Double.toString(VV[i][j]) + ",");
+                }
+                writer_VV.write("\n");
+            }
+            writer_VV.close();
+
+        } catch (IOException iox) {
+            System.out.println("Problemwriting" + "UU.dat" + "VV.dat");
+        }
+
+
+//        String line;
 //        try{
-//            BufferedReader in = new BufferedReader(new FileReader("SparkOut/PartitionTest.dat"));
-//            double[][] VV = new double[num_q][512];
+//            BufferedReader in = new BufferedReader(new FileReader("SparkOut/PartitionTest.text"));
+//            double[][] VV = new double[num_q][128];
 //            for (int j =0; j < num_q; j++) {
-//                for (int k = 0; k < 512; k++) {
+//                for (int k = 0; k < 128; k++) {
 //                    line = in.readLine();
 //                    String[] data = line.trim().split(",");
-//                    VV[j][k] = .(data[0]);
+//                    VV[j][k] = Double.valueOf(data[0]);
 //                }
-//
+//            }
+//            for (int j =0; j < num_q; j++) {
+//                for (int k = 0; k < 10; k++) {
+//                    System.out.println(VV[j][k]);
+//                }
 //            }
 //
 //        } catch (IOException iox) {
