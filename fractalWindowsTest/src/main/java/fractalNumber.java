@@ -38,7 +38,8 @@ public class fractalNumber {
 //		double[] UU = new double[networkDiameter];
 
         Logger.getLogger("org").setLevel(Level.ERROR);
-        SparkConf conf = new SparkConf().setAppName("numberGenerater").setMaster("local[*]");
+        SparkConf conf = new SparkConf().setAppName("numberGenerater")
+                .setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         List<Integer> l = new ArrayList<>(centerNode.length);
