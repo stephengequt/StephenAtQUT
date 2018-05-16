@@ -28,6 +28,7 @@ public class RefrigeratedTruck extends Truck {
 		this.temp = temp;
 	}
 
+	@Override
 	public double getCost() {
 		return cost;
 	}
