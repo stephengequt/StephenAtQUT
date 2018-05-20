@@ -1,5 +1,7 @@
 package Objects;
 
+import java.util.ArrayList;
+
 public abstract class Truck {
 	//	public abstract double setCost();
 //	abstract int getCapacity();
@@ -12,5 +14,16 @@ public abstract class Truck {
 
 	public double getCost() {
 		return cost;
+	}
+
+
+	private ArrayList<Item> itemList;
+
+	public ArrayList<Item> getItemList() {
+		return itemList;
+	}
+
+	public void setItemList(ArrayList<Item> itemList) {
+		this.itemList = itemList;
 	}
 }

@@ -141,7 +141,6 @@ public class Manifest {
 		ArrayList<RefrigeratedTruck> refrigeratedTruckList = new ArrayList<>();
 		ArrayList<OrdinaryTruck> ordinaryTruckList = new ArrayList<>();
 
-		int capacity = capacityOfRTruck;
 		for (int i = 0; i < cargoItemList.size(); i++) {
 			numOfItemTemp += cargoItemList.get(i).getReorderAmount();
 			itemListTemp.add(cargoItemList.get(i));
@@ -207,10 +206,12 @@ public class Manifest {
 				Item addItem = new Item();
 				addItem.setName(sortedtempCnItemList.get(i).getName());
 				addItem.setReorderAmount(amountThis);
+				addItem.setQuantity(amountThis);
 				addItem.setTemp(sortedtempCnItemList.get(i).getTemp());
 
 				cargoItemList.add(addItem);
 				sortedtempCnItemList.get(i).setReorderAmount(amountNext);
+
 				if (sortedtempCnItemList.get(i).getTemp() == null) {
 					capacityOfTruck = capacityOfOTruck;
 				}

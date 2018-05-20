@@ -7,6 +7,7 @@ public class RefrigeratedTruck extends Truck {
 
 	private double cost;
 	private static final int capacity = 800;
+
 	private ArrayList<Item> itemList;
 
 //	public RefrigeratedTruck(String temp, ArrayList<Item> itemlist) {
@@ -38,10 +39,13 @@ public class RefrigeratedTruck extends Truck {
 		this.cost = 900 + 200 * Math.pow(0.7, (Integer.valueOf(temp)/5));
 	}
 
-//	public ArrayList<Item> getItemList() {
-//		return itemList;
-//	}
 
+	@Override
+	public ArrayList<Item> getItemList() {
+		return itemList;
+	}
+
+	@Override
 	public void setItemList(ArrayList<Item> itemList) {
 		this.itemList = itemList;
 	}

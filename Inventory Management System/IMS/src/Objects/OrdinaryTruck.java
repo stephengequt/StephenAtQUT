@@ -9,6 +9,12 @@ public class OrdinaryTruck extends Truck {
 
 	private double cost;
 	private static final int capacity = 1000;
+
+	@Override
+	public ArrayList<Item> getItemList() {
+		return itemList;
+	}
+
 	private ArrayList<Item> itemList;
 
 //	public RefrigeratedTruck(String temp, ArrayList<Item> itemlist) {
@@ -43,7 +49,7 @@ public class OrdinaryTruck extends Truck {
 //	public ArrayList<Item> getItemList() {
 //		return itemList;
 //	}
-
+	@Override
 	public void setItemList(ArrayList<Item> itemList) {
 		this.itemList = itemList;
 	}
